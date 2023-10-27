@@ -40,23 +40,25 @@ let CatModel = {};
    it's default to the Date.now function. When a new cat is made, it will execute the default
    function and return the current date.
 */
+// Schema is like an empty object template
 const CatSchema = new mongoose.Schema({
   name: {
-    type: String,
-    required: true,
-    trim: true,
-    unique: true,
+    type: String, // Unlike js, Mongo is typed, so we need to specify type
+    required: true, // Needed for the cat object
+    trim: true, // Automatically trims whitespace when set
+    unique: true, // Can't have other cats w/ same name
   },
 
   bedsOwned: {
     type: Number,
-    min: 0,
+    min: 0, // Minimum possible value
     required: true,
   },
 
   createdDate: {
-    type: Date,
-    default: Date.now,
+    type: Date, 
+    default: Date.now, // Default is used when this variable is not set during construction. 
+    // Set to a function which will run during construction
   },
 
 });

@@ -1,4 +1,6 @@
 // pull in our models. This will automatically load the index.js from that folder
+// Because index.js exports the other files as objects, we can reference all of them
+// from one location.
 const models = require('../models');
 
 // get the Cat model
@@ -11,7 +13,7 @@ const defaultData = {
 };
 
 // object for us to keep track of the last Cat we made and dynamically update it sometimes
-let lastAdded = new Cat(defaultData);
+let lastAdded = new Cat(defaultData); // Last time we have state stored on the server
 
 // Function to handle rendering the index page.
 const hostIndex = (req, res) => {
@@ -128,7 +130,7 @@ const setName = async (req, res) => {
        the database. All calls to the database are async, including .save() so we will await the
        databases response. If something goes wrong, we will end up in our catch() statement.
     */
-    await newCat.save();
+    await newCat.save(); // Communicate between server and database, there is a possibility of errors
   } catch (err) {
     /* If something goes wrong while communicating with the database, log the error and send
        an error message back to the client. Note that our return will return us from the setName
@@ -148,6 +150,8 @@ const setName = async (req, res) => {
     name: lastAdded.name,
     beds: lastAdded.bedsOwned,
   });
+
+  // Use MongoDB Compass to check status of database while coding
 };
 
 // Function to handle searching a cat by name.
