@@ -245,6 +245,11 @@ const notFound = (req, res) => {
   });
 };
 
+// ======= ADDED CODE =======
+const addDog = (req, res) => {
+  
+};
+
 // export the relevant public controller functions
 module.exports = {
   index: hostIndex,
