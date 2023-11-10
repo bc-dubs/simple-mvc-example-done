@@ -3,8 +3,8 @@
 // from one location.
 const models = require('../models');
 
-// get the Cat model
-const { Cat } = models;
+// get the Cat and Dog models
+const { Cat, Dog } = models;
 
 // default fake data so that we have something to work with until we make a real Cat
 const defaultData = {
@@ -83,6 +83,16 @@ const hostPage2 = (req, res) => {
 // Function to render the untemplated page3.
 const hostPage3 = (req, res) => {
   res.render('page3');
+};
+
+const hostPage4 = async (req, res) => {
+  try {
+    const dogList = await Dog.find({}).lean().exec();
+    return res.render('page4', { dogs: dogList });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ error: "Could not find dogs"});
+  }
 };
 
 // Get name will return the name of the last added cat.
@@ -167,7 +177,7 @@ const searchName = async (req, res) => {
     return res.status(400).json({ error: 'Name is required to perform a search' });
   }
 
-  /* If they do give us a name to search, we will as the database for a cat with that name.
+  /* If they do give us a name to search, we will ask the database for a cat with that name.
      Remember that since we are interacting with the database, we want to wrap our code in a
      try/catch in case the database throws an error or doesn't respond.
   */
@@ -246,9 +256,55 @@ const notFound = (req, res) => {
 };
 
 // ======= ADDED CODE =======
-const addDog = (req, res) => {
-  
+const addDog = async (req, res) => {
+  if(!req.body.name || !req.body.breed || !req.body.age){
+    return res.status(400).json({error: "A dog must have a name, breed, and age"});
+  }
+
+  const dogData = {name: req.body.name, breed: req.body.breed, age: req.body.age};
+
+  const newDog = new Dog(dogData);
+
+  try{
+    await newDog.save();
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({error: "Error while attempting to create dog"})
+  }
 };
+
+const dogBirthday = async (req, res) => {
+  if(!req.body.dogName){
+    res.status(400).json({ error: "Cannot search without dog name" });
+  }
+
+  let storedDog;
+
+  try{
+    storedDog = await Dog.findOne({ name: req.body.dogName }).exec();
+  } catch(err) {
+    console.log(err);
+    res.status(500).json({ error: "Error while searching for dog" });
+  }
+
+  if(!storedDog){
+    res.status(404).json({ error: "No dog found with the given name"})
+  }
+
+  storedDog.age++;
+  const savePromise = storedDog.save();
+
+  savePromise.then(() => res.json({
+    name: storedDog.name,
+    breed: storedDog.breed,
+    age: storedDog.age
+  }));
+
+  savePromise.catch((err) => {
+    console.log(err);
+    return res.status(500).json({ error: "Error while saving dog" });
+  });
+}
 
 // export the relevant public controller functions
 module.exports = {
@@ -256,9 +312,12 @@ module.exports = {
   page1: hostPage1,
   page2: hostPage2,
   page3: hostPage3,
+  page4: hostPage4,
   getName,
   setName,
   updateLast,
   searchName,
   notFound,
+  addDog,
+  dogBirthday
 };
