@@ -91,7 +91,7 @@ const hostPage4 = async (req, res) => {
     return res.render('page4', { dogs: dogList });
   } catch (err) {
     console.log(err);
-    return res.status(500).json({ error: "Could not find dogs"});
+    return res.status(500).json({ error: 'Could not find dogs' });
   }
 };
 
@@ -140,7 +140,8 @@ const setName = async (req, res) => {
        the database. All calls to the database are async, including .save() so we will await the
        databases response. If something goes wrong, we will end up in our catch() statement.
     */
-    await newCat.save(); // Communicate between server and database, there is a possibility of errors
+    // Communicate between server and database, there is a possibility of errors
+    await newCat.save();
   } catch (err) {
     /* If something goes wrong while communicating with the database, log the error and send
        an error message back to the client. Note that our return will return us from the setName
@@ -257,38 +258,40 @@ const notFound = (req, res) => {
 
 // ======= ADDED CODE =======
 const addDog = async (req, res) => {
-  if(!req.body.name || !req.body.breed || !req.body.age){
-    return res.status(400).json({error: "A dog must have a name, breed, and age"});
+  if (!req.body.name || !req.body.breed || !req.body.age) {
+    return res.status(400).json({ error: 'A dog must have a name, breed, and age' });
   }
 
-  const dogData = {name: req.body.name, breed: req.body.breed, age: req.body.age};
+  const dogData = { name: req.body.name, breed: req.body.breed, age: req.body.age };
 
   const newDog = new Dog(dogData);
 
-  try{
+  try {
     await newDog.save();
   } catch (err) {
     console.log(err);
-    res.status(500).json({error: "Error while attempting to create dog"})
+    return res.status(500).json({ error: 'Error while attempting to create dog' });
   }
+
+  return res.json({ name: req.body.name, breed: req.body.breed, age: req.body.age });
 };
 
 const dogBirthday = async (req, res) => {
-  if(!req.body.dogName){
-    res.status(400).json({ error: "Cannot search without dog name" });
+  if (!req.body.dogName) {
+    return res.status(400).json({ error: 'Cannot search without dog name' });
   }
 
   let storedDog;
 
-  try{
+  try {
     storedDog = await Dog.findOne({ name: req.body.dogName }).exec();
-  } catch(err) {
+  } catch (err) {
     console.log(err);
-    res.status(500).json({ error: "Error while searching for dog" });
+    return res.status(500).json({ error: 'Error while searching for dog' });
   }
 
-  if(!storedDog){
-    res.status(404).json({ error: "No dog found with the given name"})
+  if (!storedDog) {
+    return res.status(404).json({ error: 'No dog found with the given name' });
   }
 
   storedDog.age++;
@@ -297,14 +300,14 @@ const dogBirthday = async (req, res) => {
   savePromise.then(() => res.json({
     name: storedDog.name,
     breed: storedDog.breed,
-    age: storedDog.age
+    age: storedDog.age,
   }));
 
   savePromise.catch((err) => {
     console.log(err);
-    return res.status(500).json({ error: "Error while saving dog" });
+    return res.status(500).json({ error: 'Error while saving dog' });
   });
-}
+};
 
 // export the relevant public controller functions
 module.exports = {
@@ -319,5 +322,5 @@ module.exports = {
   searchName,
   notFound,
   addDog,
-  dogBirthday
+  dogBirthday,
 };

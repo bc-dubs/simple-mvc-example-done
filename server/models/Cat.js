@@ -56,8 +56,8 @@ const CatSchema = new mongoose.Schema({
   },
 
   createdDate: {
-    type: Date, 
-    default: Date.now, // Default is used when this variable is not set during construction. 
+    type: Date,
+    default: Date.now, // Default is used when this variable is not set during construction.
     // Set to a function which will run during construction
   },
 
