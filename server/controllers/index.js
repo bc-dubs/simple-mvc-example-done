@@ -297,16 +297,16 @@ const dogBirthday = async (req, res) => {
   storedDog.age++;
   const savePromise = storedDog.save();
 
-  savePromise.then(() => res.json({
-    name: storedDog.name,
-    breed: storedDog.breed,
-    age: storedDog.age,
-  }));
-
   savePromise.catch((err) => {
     console.log(err);
     return res.status(500).json({ error: 'Error while saving dog' });
   });
+
+  return savePromise.then(() => res.json({
+    name: storedDog.name,
+    breed: storedDog.breed,
+    age: storedDog.age,
+  })); // no idea if this works like we want but it makes eslint happy
 };
 
 // export the relevant public controller functions
